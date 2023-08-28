@@ -2,10 +2,14 @@ package com.example.tasklist.web.controller;
 
 
 import com.example.tasklist.domain.task.Task;
+import com.example.tasklist.domain.task.TaskImage;
 import com.example.tasklist.service.TaskService;
 import com.example.tasklist.web.dto.task.TaskDto;
+import com.example.tasklist.web.dto.task.TaskImageDto;
 import com.example.tasklist.web.dto.validation.OnUpdate;
+import com.example.tasklist.web.mappers.TaskImageMapper;
 import com.example.tasklist.web.mappers.TaskMapper;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +26,7 @@ public class TaskController {
     private final TaskService taskService;
 
     private final TaskMapper taskMapper;
+    private final TaskImageMapper taskImageMapper;
 
     @PutMapping
     @PreAuthorize("canAccessTask(#dto.id)")
@@ -42,6 +47,17 @@ public class TaskController {
     @PreAuthorize("canAccessTask(#id)")
     public void deleteById(@PathVariable Long id){
         taskService.delete(id);
+    }
+
+
+    @PostMapping("{id}/image")
+    @Operation(summary = "Upload image to task")
+    @PreAuthorize("canAccessTask(#id)")
+    public void uploadImage(@PathVariable Long id ,
+                            @Validated @ModelAttribute TaskImageDto imageDto){
+        TaskImage image = taskImageMapper.toEntity(imageDto);
+        taskService.uploadImage(id , image);
+
     }
 
 
